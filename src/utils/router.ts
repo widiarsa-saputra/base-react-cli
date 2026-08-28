@@ -46,3 +46,42 @@ export async function injectRouteToAppRouter(options: {
     await fs.writeFile(routerPath, content, 'utf-8');
     console.log(pc.green(`✔ Route terdaftar otomatis di src/router/AppRouter.tsx`));
 }
+
+export async function injectMenuToAppRouter(options: {
+    sectionId: string;
+    constantKey: string;
+    menuText: string;
+    icon: string;
+}): Promise<void> {
+    const routerPath = path.resolve(process.cwd(), 'src/router/AppRouter.tsx');
+
+    if (!fs.existsSync(routerPath)) {
+        console.log(pc.yellow(`⚠️  AppRouter.tsx tidak ditemukan di "${routerPath}". Injeksi menu dilewati.`));
+        return;
+    }
+
+    let content = await fs.readFile(routerPath, 'utf-8');
+
+    // check if it's already there
+    if (content.includes(`url: ROUTES.${options.constantKey}.path`)) {
+        console.log(pc.yellow(`⚠️  Menu untuk ${options.constantKey} sudah terdaftar di AppRouter.tsx.`));
+        return;
+    }
+
+    const newItem = `            {
+                text: "${options.menuText}",
+                url: ROUTES.${options.constantKey}.path,
+                icon: ${options.icon},
+                permissions: ["view_${options.constantKey.toLowerCase()}"]
+            },`;
+
+    const sectionRegex = new RegExp(`(id\\s*:\\s*['"]${options.sectionId}['"]\\s*,[\\s\\S]*?items\\s*:\\s*\\[)`);
+    
+    if (content.match(sectionRegex)) {
+        content = content.replace(sectionRegex, `$1\n${newItem}`);
+        await fs.writeFile(routerPath, content, 'utf-8');
+        console.log(pc.green(`✔ Menu terdaftar otomatis di section "${options.sectionId}" di src/router/AppRouter.tsx`));
+    } else {
+        console.log(pc.red(`❌ Section dengan id "${options.sectionId}" tidak ditemukan di AppRouter.tsx.`));
+    }
+}

@@ -70,52 +70,105 @@ ${routeEntry}`);
   await fs2.writeFile(routerPath, content, "utf-8");
   console.log(pc.green(`\u2714 Route terdaftar otomatis di src/router/AppRouter.tsx`));
 }
+async function injectMenuToAppRouter(options) {
+  const routerPath = path2.resolve(process.cwd(), "src/router/AppRouter.tsx");
+  if (!fs2.existsSync(routerPath)) {
+    console.log(pc.yellow(`\u26A0\uFE0F  AppRouter.tsx tidak ditemukan di "${routerPath}". Injeksi menu dilewati.`));
+    return;
+  }
+  let content = await fs2.readFile(routerPath, "utf-8");
+  if (content.includes(`url: ROUTES.${options.constantKey}.path`)) {
+    console.log(pc.yellow(`\u26A0\uFE0F  Menu untuk ${options.constantKey} sudah terdaftar di AppRouter.tsx.`));
+    return;
+  }
+  const newItem = `            {
+                text: "${options.menuText}",
+                url: ROUTES.${options.constantKey}.path,
+                icon: ${options.icon},
+                permissions: ["view_${options.constantKey.toLowerCase()}"]
+            },`;
+  const sectionRegex = new RegExp(`(id\\s*:\\s*['"]${options.sectionId}['"]\\s*,[\\s\\S]*?items\\s*:\\s*\\[)`);
+  if (content.match(sectionRegex)) {
+    content = content.replace(sectionRegex, `$1
+${newItem}`);
+    await fs2.writeFile(routerPath, content, "utf-8");
+    console.log(pc.green(`\u2714 Menu terdaftar otomatis di section "${options.sectionId}" di src/router/AppRouter.tsx`));
+  } else {
+    console.log(pc.red(`\u274C Section dengan id "${options.sectionId}" tidak ditemukan di AppRouter.tsx.`));
+  }
+}
 
 // src/commands/make-module.ts
-function registerMakeModuleCommand(program2) {
-  program2.command("make:module [name]").description("Generate modular feature UI, TanStack Query hooks, schemas, dan inject route").action(async (nameArg) => {
-    console.log(pc2.cyan("\n\u{1F680} Base React Module Generator (Full Module)\n"));
-    const singularInput = nameArg ? nameArg.trim() : await input({
-      message: "Nama modul (singular, misal: student, course, category):",
-      validate: (val) => val.trim().length > 0 || "Nama tidak boleh kosong"
-    });
-    const singularName = pluralize.singular(singularInput);
-    const pluralName = pluralize.plural(singularName);
-    const namePascal = pascalCase2(singularName);
-    const nameKebab = kebabCase2(singularName);
-    const pluralKebab = kebabCase2(pluralName);
-    const constantKey = constantCase2(pluralName);
-    console.log(pc2.gray(`\u2022 Feature (Singular) : ${nameKebab}`));
-    console.log(pc2.gray(`\u2022 Service (Plural)   : ${pluralKebab}
+async function generateModule(nameArg, sectionInfo) {
+  console.log(pc2.cyan("\n\u{1F680} Base React Module Generator (Full Module)\n"));
+  const singularInput = nameArg ? nameArg.trim() : await input({
+    message: "Nama modul (singular, misal: student, course, category):",
+    validate: (val) => val.trim().length > 0 || "Nama tidak boleh kosong"
+  });
+  const singularName = pluralize.singular(singularInput);
+  const pluralName = pluralize.plural(singularName);
+  const namePascal = pascalCase2(singularName);
+  const nameKebab = kebabCase2(singularName);
+  const pluralKebab = kebabCase2(pluralName);
+  const constantKey = constantCase2(pluralName);
+  console.log(pc2.gray(`\u2022 Feature (Singular) : ${nameKebab}`));
+  console.log(pc2.gray(`\u2022 Service (Plural)   : ${pluralKebab}
 `));
-    const featurePath = path3.resolve(process.cwd(), "src/features", nameKebab);
-    const servicePath = path3.resolve(process.cwd(), "src/services", pluralKebab);
-    if (fs3.existsSync(featurePath) || fs3.existsSync(servicePath)) {
-      const overwrite = await confirm({
-        message: `Modul "${nameKebab}" atau service "${pluralKebab}" sudah ada. Timpa file yang ada?`,
-        default: false
-      });
-      if (!overwrite) return;
-    }
-    const templateData = { name: singularName, pluralName };
-    await fs3.ensureDir(path3.join(featurePath, "components"));
-    await fs3.ensureDir(path3.join(featurePath, "pages"));
-    await fs3.ensureDir(path3.join(servicePath, "hooks"));
-    await fs3.ensureDir(path3.join(servicePath, "response"));
-    await fs3.ensureDir(path3.join(servicePath, "schema"));
-    await fs3.writeFile(path3.join(featurePath, "pages", `${namePascal}Page.tsx`), renderTemplate("features/pages/Page.hbs", templateData));
-    await fs3.writeFile(path3.join(featurePath, "components", `${namePascal}MainContent.tsx`), renderTemplate("features/components/MainContent.hbs", templateData));
-    await fs3.writeFile(path3.join(featurePath, "components", `${namePascal}MutationForm.tsx`), renderTemplate("features/components/MutationForm.hbs", templateData));
-    await fs3.writeFile(path3.join(featurePath, "components", `Remove${namePascal}.tsx`), renderTemplate("features/components/RemoveComponent.hbs", templateData));
-    await fs3.writeFile(path3.join(servicePath, "hooks", `use${namePascal}CRUD.ts`), renderTemplate("services/hooks/useCRUD.hbs", templateData));
-    await fs3.writeFile(path3.join(servicePath, "response", `${namePascal}Response.ts`), renderTemplate("services/response/Response.hbs", templateData));
-    await fs3.writeFile(path3.join(servicePath, "schema", `${namePascal}Schema.ts`), renderTemplate("services/schema/Schema.hbs", templateData));
-    console.log(pc2.green(`\u2714 UI Layer dibuat di: src/features/${nameKebab}`));
-    console.log(pc2.green(`\u2714 Service Layer dibuat di: src/services/${pluralKebab}`));
-    await injectRouteToAppRouter({ namePascal, nameKebab, pluralKebab, constantKey });
-    console.log(pc2.cyan(`
+  const featurePath = path3.resolve(process.cwd(), "src/features", nameKebab);
+  const servicePath = path3.resolve(process.cwd(), "src/services", pluralKebab);
+  if (fs3.existsSync(featurePath) || fs3.existsSync(servicePath)) {
+    const overwrite = await confirm({
+      message: `Modul "${nameKebab}" atau service "${pluralKebab}" sudah ada. Timpa file yang ada?`,
+      default: false
+    });
+    if (!overwrite) return;
+  }
+  const templateData = { name: singularName, pluralName };
+  await fs3.ensureDir(path3.join(featurePath, "components"));
+  await fs3.ensureDir(path3.join(featurePath, "pages"));
+  await fs3.ensureDir(path3.join(servicePath, "hooks"));
+  await fs3.ensureDir(path3.join(servicePath, "response"));
+  await fs3.ensureDir(path3.join(servicePath, "schema"));
+  await fs3.writeFile(path3.join(featurePath, "pages", `${namePascal}Page.tsx`), renderTemplate("features/pages/Page.hbs", templateData));
+  await fs3.writeFile(path3.join(featurePath, "components", `${namePascal}MainContent.tsx`), renderTemplate("features/components/MainContent.hbs", templateData));
+  await fs3.writeFile(path3.join(featurePath, "components", `${namePascal}MutationForm.tsx`), renderTemplate("features/components/MutationForm.hbs", templateData));
+  await fs3.writeFile(path3.join(featurePath, "components", `Remove${namePascal}.tsx`), renderTemplate("features/components/RemoveComponent.hbs", templateData));
+  await fs3.writeFile(path3.join(servicePath, "hooks", `use${namePascal}CRUD.ts`), renderTemplate("services/hooks/useCRUD.hbs", templateData));
+  await fs3.writeFile(path3.join(servicePath, "response", `${namePascal}Response.ts`), renderTemplate("services/response/Response.hbs", templateData));
+  await fs3.writeFile(path3.join(servicePath, "schema", `${namePascal}Schema.ts`), renderTemplate("services/schema/Schema.hbs", templateData));
+  console.log(pc2.green(`\u2714 UI Layer dibuat di: src/features/${nameKebab}`));
+  console.log(pc2.green(`\u2714 Service Layer dibuat di: src/services/${pluralKebab}`));
+  await injectRouteToAppRouter({ namePascal, nameKebab, pluralKebab, constantKey });
+  if (sectionInfo) {
+    await injectMenuToAppRouter({
+      sectionId: sectionInfo.id,
+      constantKey,
+      menuText: singularName.charAt(0).toUpperCase() + singularName.slice(1).replace(/-/g, " "),
+      icon: sectionInfo.icon
+    });
+  }
+  console.log(pc2.cyan(`
 \u2728 Modul "${namePascal}" berhasil digenerate!
 `));
+}
+function registerMakeModuleCommand(program2) {
+  program2.command("make:module [name]").description("Generate modular feature UI, TanStack Query hooks, schemas, dan inject route").action(async (nameArg) => {
+    await generateModule(nameArg);
+  });
+}
+function registerMakeMasterDataCommand(program2) {
+  program2.command("make:master-data [name]").description("Generate module and register to Master Data section").action(async (nameArg) => {
+    await generateModule(nameArg, { id: "master-data", icon: "Grid" });
+  });
+}
+function registerMakeSistemCommand(program2) {
+  program2.command("make:sistem [name]").description("Generate module and register to Sistem section").action(async (nameArg) => {
+    await generateModule(nameArg, { id: "sistem", icon: "Folder" });
+  });
+}
+function registerMakeProfileCommand(program2) {
+  program2.command("make:profile [name]").description("Generate module and register to Profile section").action(async (nameArg) => {
+    await generateModule(nameArg, { id: "profile", icon: "Users" });
   });
 }
 
@@ -325,13 +378,51 @@ function registerInstallBaseCommand(program2) {
   });
 }
 
+// src/commands/move-menu.ts
+import { input as input7 } from "@inquirer/prompts";
+async function moveMenu(constantKeyArg, sectionInfo) {
+  if (!sectionInfo) return;
+  const constantKey = constantKeyArg ? constantKeyArg.trim() : await input7({
+    message: "Nama rute constant key (misal: STUDENT_LIST, COURSE):",
+    validate: (val) => val.trim().length > 0 || "Key tidak boleh kosong"
+  });
+  const menuText = constantKey.split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+  await injectMenuToAppRouter({
+    sectionId: sectionInfo.id,
+    constantKey,
+    menuText,
+    icon: sectionInfo.icon
+  });
+}
+function registerMoveMasterDataCommand(program2) {
+  program2.command("move:master-data [route_key]").description("Register existing route to Master Data section").action(async (routeKey) => {
+    await moveMenu(routeKey, { id: "master-data", icon: "Grid" });
+  });
+}
+function registerMoveSistemCommand(program2) {
+  program2.command("move:sistem [route_key]").description("Register existing route to Sistem section").action(async (routeKey) => {
+    await moveMenu(routeKey, { id: "sistem", icon: "Folder" });
+  });
+}
+function registerMoveProfileCommand(program2) {
+  program2.command("move:profile [route_key]").description("Register existing route to Profile section").action(async (routeKey) => {
+    await moveMenu(routeKey, { id: "profile", icon: "Users" });
+  });
+}
+
 // src/index.ts
 var program = new Command();
 program.name("gotra").description("CLI Scaffolding Generator untuk Arsitektur Base React Vite").version("1.2.0");
 registerMakeModuleCommand(program);
+registerMakeMasterDataCommand(program);
+registerMakeSistemCommand(program);
+registerMakeProfileCommand(program);
 registerMakePageCommand(program);
 registerMakeServiceCommand(program);
 registerMakeComponentCommand(program);
 registerMakeHookCommand(program);
 registerInstallBaseCommand(program);
+registerMoveMasterDataCommand(program);
+registerMoveSistemCommand(program);
+registerMoveProfileCommand(program);
 program.parse();
