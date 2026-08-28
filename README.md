@@ -9,6 +9,10 @@ gotra make:module
 ```bash
 npx github:username/base-react-cli make:module
 ```
+or
+```
+npm install -g github:widiarsa-saputra/base-react-cli
+```
 
 CLI Scaffolding tool internal untuk standardisasi dan otomasi pembuatan modul feature (UI), service layer (TanStack Query + Zod), serta auto-inject routing pada arsitektur Base React Vite.
 

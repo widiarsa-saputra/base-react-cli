@@ -18,14 +18,19 @@
     "@inquirer/prompts": "^8.7.0",
     "change-case": "^5.4.4",
     "commander": "^15.0.0",
+    "degit": "^3.8.0",
     "fs-extra": "^11.4.0",
     "handlebars": "^4.7.9",
-    "picocolors": "^1.1.1"
+    "ora": "^9.4.1",
+    "picocolors": "^1.1.1",
+    "pluralize": "^8.0.0",
+    "tsup": "^8.5.1"
   },
   "devDependencies": {
+    "@types/degit": "^2.8.6",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^26.4.0",
-    "tsup": "^8.5.1",
+    "@types/pluralize": "^0.0.33",
     "typescript": "^7.0.2"
   }
 }
