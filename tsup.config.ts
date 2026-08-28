@@ -3,11 +3,10 @@ import { defineConfig } from 'tsup';
 export default defineConfig({
     entry: ['src/index.ts'],
     format: ['esm'],
+    target: 'es2022',
     clean: true,
     minify: false,
     sourcemap: false,
-    // Bundle semua dependencies ke dalam single file output
-    noExternal: [/.*/],
     publicDir: 'src/templates',
     outDir: 'dist',
     banner: {
