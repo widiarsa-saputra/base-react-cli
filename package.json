@@ -28,8 +28,5 @@
     "@types/pluralize": "^0.0.33",
     "typescript": "^7.0.2",
     "tsup": "^8.5.1"
-  },
-  "files": [
-    "dist"
-  ]
+  }
 }
