@@ -7,7 +7,7 @@ import degit from 'degit';
 import ora from 'ora';
 import { execSync } from 'child_process';
 
-const BASE_TEMPLATE_REPO = 'github:username/base_react';
+const BASE_TEMPLATE_REPO = 'github:widiarsa-saputra/base-react';
 
 export function registerInstallBaseCommand(program: Command): void {
     program

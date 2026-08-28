@@ -13,7 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "@inquirer/prompts": "^8.7.0",
     "change-case": "^5.4.4",
     "commander": "^15.0.0",
@@ -22,9 +22,7 @@
     "handlebars": "^4.7.9",
     "ora": "^9.4.1",
     "picocolors": "^1.1.1",
-    "pluralize": "^8.0.0"
-  },
-  "devDependencies": {
+    "pluralize": "^8.0.0",
     "@types/degit": "^2.8.6",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^26.4.0",
