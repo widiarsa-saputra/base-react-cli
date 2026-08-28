@@ -94,8 +94,8 @@ program
         });
 
         const namePascal = pascalCase(singularName);
-        const nameKebab = paramCase(singularName);
-        const pluralKebab = paramCase(pluralName);
+        const nameKebab = kebabCase(singularName);
+        const pluralKebab = kebabCase(pluralName);
         const constantKey = constantCase(pluralName);
 
         const featurePath = path.resolve(process.cwd(), 'src/features', nameKebab);
@@ -150,7 +150,7 @@ program
         });
 
         const namePascal = pascalCase(rawName);
-        const nameKebab = paramCase(rawName);
+        const nameKebab = kebabCase(rawName);
         const constantKey = constantCase(rawName);
         const featurePath = path.resolve(process.cwd(), 'src/features', nameKebab);
 
@@ -194,7 +194,7 @@ program
         });
 
         const namePascal = pascalCase(singularName);
-        const pluralKebab = paramCase(pluralName);
+        const pluralKebab = kebabCase(pluralName);
         const servicePath = path.resolve(process.cwd(), 'src/services', pluralKebab);
 
         if (fs.existsSync(servicePath)) {
