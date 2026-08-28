@@ -70,8 +70,8 @@ program.command("make:module").description("Generate modular feature UI, TanStac
     default: `${singularName}s`
   });
   const namePascal = pascalCase(singularName);
-  const nameKebab = paramCase(singularName);
-  const pluralKebab = paramCase(pluralName);
+  const nameKebab = kebabCase(singularName);
+  const pluralKebab = kebabCase(pluralName);
   const constantKey = constantCase(pluralName);
   const featurePath = path.resolve(process.cwd(), "src/features", nameKebab);
   const servicePath = path.resolve(process.cwd(), "src/services", pluralKebab);
@@ -109,7 +109,7 @@ program.command("make:page").alias("make:feature").description("Generate hanya U
     validate: (val) => val.trim().length > 0 || "Nama tidak boleh kosong"
   });
   const namePascal = pascalCase(rawName);
-  const nameKebab = paramCase(rawName);
+  const nameKebab = kebabCase(rawName);
   const constantKey = constantCase(rawName);
   const featurePath = path.resolve(process.cwd(), "src/features", nameKebab);
   if (fs.existsSync(featurePath)) {
@@ -141,7 +141,7 @@ program.command("make:service").description("Generate hanya data/API layer (hook
     default: `${singularName}s`
   });
   const namePascal = pascalCase(singularName);
-  const pluralKebab = paramCase(pluralName);
+  const pluralKebab = kebabCase(pluralName);
   const servicePath = path.resolve(process.cwd(), "src/services", pluralKebab);
   if (fs.existsSync(servicePath)) {
     const overwrite = await confirm({
