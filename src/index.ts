@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { Command } from 'commander';
 import { registerMakeModuleCommand } from './commands/make-module.js';
 import { registerMakePageCommand } from './commands/make-page.js';
