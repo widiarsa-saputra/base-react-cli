@@ -2,7 +2,7 @@
 
 ## Quick Use
 ```bash
-base_react_cli make:module
+gotra make:module
 ```
 
 ## Quick Install
@@ -91,7 +91,7 @@ npm link
 
 ```bash
 cd path/to/base_react
-base-react-cli make:module
+gotra make:module
 ```
 
 ### Panduan Interaktif CLI
