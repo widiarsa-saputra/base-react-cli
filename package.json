@@ -1,5 +1,5 @@
 {
-  "name": "gotra-cli",
+  "name": "gotra-fe",
   "version": "1.0.0",
   "description": "Custom CLI generator untuk modular React page",
   "type": "module",
