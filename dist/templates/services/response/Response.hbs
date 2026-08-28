@@ -1,0 +1,15 @@
+import { z } from "zod";
+import { BaseResponseSchema } from "@/services/base/response/BaseResponseSchema";
+import { {{pascalCase name}}IndexSchema } from "../schema/{{pascalCase name}}Schema";
+
+export const {{pascalCase name}}ListResponseSchema = BaseResponseSchema(z.array({{pascalCase name}}IndexSchema));
+export type {{pascalCase name}}ListResponse = z.infer<typeof {{pascalCase name}}ListResponseSchema>;
+
+export const {{pascalCase name}}CreateResponseSchema = BaseResponseSchema({{pascalCase name}}IndexSchema);
+export type {{pascalCase name}}CreateResponse = z.infer<typeof {{pascalCase name}}CreateResponseSchema>;
+
+export const {{pascalCase name}}UpdateResponseSchema = BaseResponseSchema({{pascalCase name}}IndexSchema);
+export type {{pascalCase name}}UpdateResponse = z.infer<typeof {{pascalCase name}}UpdateResponseSchema>;
+
+export const {{pascalCase name}}ShowResponseSchema = BaseResponseSchema({{pascalCase name}}IndexSchema);
+export type {{pascalCase name}}ShowResponse = z.infer<typeof {{pascalCase name}}ShowResponseSchema>;

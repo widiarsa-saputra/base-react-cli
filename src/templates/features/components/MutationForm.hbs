@@ -1,0 +1,27 @@
+import React from 'react';
+import { UseFormReturn } from 'react-hook-form';
+import { FloatingInput } from '@/components/FloatingInput';
+import { {{pascalCase name}}CreatePayload } from '@/services/{{kebabCase pluralName}}/schema/{{pascalCase name}}Schema';
+
+export interface {{pascalCase name}}MutationFormProps {
+    form: UseFormReturn<{{pascalCase name}}CreatePayload>;
+}
+
+const {{pascalCase name}}MutationForm: React.FC<{{pascalCase name}}MutationFormProps> = ({ form }) => {
+    const { register, formState: { errors }, watch } = form;
+
+    return (
+        <form className="flex flex-col gap-4" id="{{kebabCase name}}-form">
+            <FloatingInput
+                id="name"
+                label="Nama {{pascalCase name}}"
+                required
+                inputProps={{ ...register('name'), placeholder: "Masukkan nama..." }}
+                error={errors.name?.message as string}
+                watch={watch('name')}
+            />
+        </form>
+    );
+};
+
+export default {{pascalCase name}}MutationForm;
