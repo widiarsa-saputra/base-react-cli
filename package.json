@@ -1,10 +1,10 @@
 {
-  "name": "base_react_cli",
+  "name": "gotra-cli",
   "version": "1.0.0",
   "description": "Custom CLI generator untuk modular React page",
   "type": "module",
   "bin": {
-    "gotra": "./dist/index.js"
+    "gotra": "dist/index.js"
   },
   "scripts": {
     "dev": "tsup --watch",
@@ -28,5 +28,8 @@
     "@types/pluralize": "^0.0.33",
     "typescript": "^7.0.2",
     "tsup": "^8.5.1"
-  }
+  },
+  "files": [
+    "dist"
+  ]
 }
